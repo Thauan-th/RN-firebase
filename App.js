@@ -1,57 +1,85 @@
 import React  from 'react';
 
-//expo
-import { StatusBar } from 'expo-status-bar';
-
 //native-base
-import { Text, View ,  SafeAreaView , TextInput , Button, ActivityIndicator} from 'react-native';
+import {FlatList ,TouchableOpacity , Text, View ,  SafeAreaView , TextInput , Button, ActivityIndicator } from 'react-native';
 
 //styles
 import styles from './src/styles/styles'
 
 //firebase
 import firebase from './src/config/firebase'
-import { FlatList } from 'react-native';
+
+//components
+import Login from './src/components/Login'
+import TaskItem from './src/components/Tasks';
 
 export default function App() {
-  const [senha,setSenha] = React.useState('')
-  const [email,setEmail] = React.useState('')
-  const [nome,setNome] = React.useState('')
 
-  const fb =  firebase.database().ref('usuarios')
 
-  async function Logar(){
-      if(senha.length ===0 &&  email.length ===0 ){
-        return alert('Preencha corretamente os campos')
+  const fakeTaxi = [{
+    id:'1',
+    conteudo:'Estudar JS'
+  },{
+    id:'2',
+    conteudo:'Provas faculdade'
+  }
+]
+
+  const [user,setUser] = React.useState(false)
+
+  const [newTask ,setNewTask] = React.useState('')
+  const [task,setTask] = React.useState(fakeTaxi)
+
+  async function addTask(){
+    if(newTask.length ===0) return alert('Preencha o campo conforme o combinado ')
+
+    let tasks = fb.child(user)
+    let keyUnique =  tasks.push().key
+    tasks.child(keyUnique).set({
+      conteudo:newTask
+    }).then(_=>{
+      const data ={
+        id : keyUnique,
+        conteudo: newTask
       }
-      await firebase.auth().createUserWithEmailAndPassword(email,senha).then(value=>{
-        fb.child(value.user.uid).set({
-          nome,
-          email,
-          senha
-        })
-      }).catch(err=>{
-        if(err)console.log(err) 
-      })
-  }
-  async function logOut(){
-    alert('deslocado')
-    setUser('')
-    setSenha('')
-    setEmail('')
+      setTask(prev=>[...prev,data])
+    })
+    setNewTask('')
+
   }
 
 
+  async function getTasks(){
+    console.log('get')
+  }
+
+
+  async function deleteItem(key){
+    console.log(key)
+  }
+  
+  async function editItem(item){
+    console.log(item)
+  }
+
+  const fb =  firebase.database().ref('Tarefas')
+  if(!user){
+    return <SafeAreaView style={styles.container} > <Login changeStatus={setUser}/> </SafeAreaView>
+  }
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Nome</Text>
-      <TextInput value={nome} onChangeText={e=>setNome(e)} style={styles.input} />
-      <Text>Email</Text>
-      <TextInput value={email} onChangeText={e=>setEmail(e)} style={styles.input} />
-      <Text>Senha</Text>
-      <TextInput value={senha} onChangeText={e=>setSenha(e)} style={styles.input} />
-      <Button title='Logar' onPress={Logar}/>
-      <StatusBar style="auto" hidden={true} />
+      <View style={styles.containerTask}>
+        <TextInput
+          onChangeText={txt=>setNewTask(txt)}
+          value={newTask}
+          placeholder='Que tarefa voce vai fazer ?'
+          style={styles.input}
+        />
+        <TouchableOpacity style={styles.buttonAddTask} onPress={addTask}>
+          <Text style={{color:'white',fontSize:15}}>+</Text>
+        </TouchableOpacity>
+      </View>
+      <FlatList data={task} keyExtractor={item=>item.id} renderItem={({item})=><TaskItem editItem={editItem} deleteItem={deleteItem} item={item}/>}/>
     </SafeAreaView>
   );
 }
