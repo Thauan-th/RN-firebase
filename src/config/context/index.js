@@ -29,7 +29,7 @@ export default ({children})=>{
     firebase.auth().createUserWithEmailAndPassword(email,password).then(async (_)=>{
       let uid = _.user.uid
       await firebase.database().ref('users').child(uid).set({
-        set:0,
+        saldo:0,
         nome
       }).then(()=>{
         let data ={
