@@ -10,8 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../config/context';
 
 //styles
-import { Background, Container, Logo, AreaInput, Input, SubmitButton, 
-SubmitText, Link, LinkText} from './styles';
+import { Background, Container, Logo, AreaInput, Input, SubmitButton, SubmitText, Link, LinkText} from './styles';
 
 export default ( )=> {
 
@@ -19,7 +18,11 @@ export default ( )=> {
   const [password, setPassword] = useState('');
   const navigate = useNavigation()
 
-  const {} = React.useContext(AuthContext)
+  const {user,signIn,redirect} = React.useContext(AuthContext)
+
+  function Login(){
+    signIn(email,password)
+  }
 
  return (
    <Background>
@@ -49,11 +52,11 @@ export default ( )=> {
           />
         </AreaInput>
 
-      <SubmitButton>
+      <SubmitButton onPress={Login}>
         <SubmitText>Acessar</SubmitText>
       </SubmitButton>
 
-      <Link onPress={()=>navigate.navigate('SigUp')}>
+      <Link onPress={()=>redirect('SigUp')}>
         <LinkText>Criar uma conta!</LinkText>
       </Link>
 

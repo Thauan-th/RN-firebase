@@ -7,11 +7,19 @@ import { Platform } from 'react-native';
 import { Background, Container, Logo, AreaInput, Input, SubmitButton, 
 SubmitText, Link, LinkText} from '../SigIn/styles'
 
+//context
+import { AuthContext } from '../../config/context';
+
 export default ( )=> {
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
   const [password, setPassword] = useState('');
 
+  const {user ,signUp} = React.useContext(AuthContext)
+
+  function handleSignup(){
+    signUp(email,password,nome)
+  }
  return (
    <Background>
       <Container
@@ -49,7 +57,7 @@ export default ( )=> {
           />
         </AreaInput>
 
-      <SubmitButton>
+      <SubmitButton onPress={handleSignup}>
         <SubmitText>Acessar</SubmitText>
       </SubmitButton>
 
